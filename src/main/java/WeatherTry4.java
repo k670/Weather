@@ -28,10 +28,7 @@ public class WeatherTry4 {
 
             for (Element headline : newsHeadlines) {
 
-                for (Element newElem:headline.select("li") ) {
-
-                    linkList.add(newElem);
-                }
+                linkList.addAll(headline.select("li"));
             }
 
         }catch (Exception ex){
