@@ -10,18 +10,18 @@ public class Singleton {
        super();
    }
 
-   public synchronized void writeToFile(String data) throws IOException {
-       Files.write(Paths.get("D://test.txt"), data.getBytes(), StandardOpenOption.APPEND);
+   public synchronized void writeToFile(String data, String fileName) throws IOException {
+       Files.write(Paths.get(fileName), data.getBytes(), StandardOpenOption.APPEND);
    }
 
-    public  void deleteAndCreateFile(String data) throws IOException {
+    public  void deleteAndCreateFile(String fileName) throws IOException {
         try
         {
-            Files.deleteIfExists(Paths.get(data));
+            Files.deleteIfExists(Paths.get(fileName));
         }catch (Exception ex){
             System.out.println(ex.getMessage());
         }finally {
-            Files.createFile(Paths.get(data));
+            Files.createFile(Paths.get(fileName));
         }
     }
 
