@@ -16,25 +16,20 @@ public class WeatherTry4 {
 
 
      boolean WeatherReadToFileExecutor(String fileName, int countThreads, int timeIntervalMilliseconds){
-        ScheduledExecutorService executorService = Executors.newScheduledThreadPool(countThreads, new ThreadFactory() {
-            public Thread newThread(Runnable r) {
-                Thread t = Executors.defaultThreadFactory().newThread(r);
-                t.setDaemon(true);
-                return t;
-            }
-        });
+        ScheduledExecutorService executorService = Executors.newScheduledThreadPool(countThreads);
 
         if(CreateFile(fileName)&&LoadLinkList(0)) {
             while (linkList.size() > 0) {
-                executorService.scheduleAtFixedRate((new WeatherWriter(linkList, fileName)), 0, timeIntervalMilliseconds, TimeUnit.MILLISECONDS);
+                executorService.scheduleAtFixedRate((new WeatherWriter(linkList, fileName)), 100, timeIntervalMilliseconds, TimeUnit.MILLISECONDS);
             }
-        }
-         try {
-             executorService.awaitTermination(40,TimeUnit.SECONDS);
-         } catch (InterruptedException e) {
-             e.printStackTrace();
-         }
-         return true;
+            try {
+                executorService.awaitTermination(400,TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return true;
+        }else return false;
+
     }
 
      boolean WeatherReadToFileForkJoin(String fileName, int countThreads, int timeIntervalMilliseconds){
@@ -54,13 +49,13 @@ public class WeatherTry4 {
                 }
             }
 
-        }
-         try {
-             pool.awaitTermination(35,TimeUnit.SECONDS);
-         } catch (InterruptedException e) {
-             e.printStackTrace();
-         }
-        return true;
+            try {
+                pool.awaitTermination(60,TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return true;
+        }else return false;
     }
 
       private boolean LoadLinkList(int timeout){

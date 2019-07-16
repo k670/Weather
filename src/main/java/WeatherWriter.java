@@ -61,7 +61,7 @@ public class WeatherWriter extends RecursiveAction implements Runnable{
     }
 
     private ConcurrentHashMap<Date,TemperatureModel> parsDoc(Document doc) {
-        ConcurrentHashMap<Date,TemperatureModel> temperatureModel = new     ConcurrentHashMap<Date,TemperatureModel>();
+        ConcurrentHashMap<Date,TemperatureModel> temperatureModel = new  ConcurrentHashMap<Date,TemperatureModel>();
         Date dt = new Date();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         Calendar c = Calendar.getInstance();
