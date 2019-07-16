@@ -1,4 +1,5 @@
 
+import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import java.io.IOException;
 import java.util.concurrent.*;
@@ -15,16 +16,25 @@ public class WeatherTry4 {
 
 
      boolean WeatherReadToFileExecutor(String fileName, int countThreads, int timeIntervalMilliseconds){
-        ScheduledExecutorService executorService = Executors.newScheduledThreadPool(countThreads);
+        ScheduledExecutorService executorService = Executors.newScheduledThreadPool(countThreads, new ThreadFactory() {
+            public Thread newThread(Runnable r) {
+                Thread t = Executors.defaultThreadFactory().newThread(r);
+                t.setDaemon(true);
+                return t;
+            }
+        });
 
         if(CreateFile(fileName)&&LoadLinkList(0)) {
             while (linkList.size() > 0) {
-
                 executorService.scheduleAtFixedRate((new WeatherWriter(linkList, fileName)), 0, timeIntervalMilliseconds, TimeUnit.MILLISECONDS);
             }
         }
-        executorService.shutdown();
-        return true;
+         try {
+             executorService.awaitTermination(40,TimeUnit.SECONDS);
+         } catch (InterruptedException e) {
+             e.printStackTrace();
+         }
+         return true;
     }
 
      boolean WeatherReadToFileForkJoin(String fileName, int countThreads, int timeIntervalMilliseconds){
@@ -50,13 +60,26 @@ public class WeatherTry4 {
          } catch (InterruptedException e) {
              e.printStackTrace();
          }
-        return pool.isTerminated();
+        return true;
     }
 
       private boolean LoadLinkList(int timeout){
         Document doc = null;
+          Connection.Response response = null;
+          int code = 0;
         try {
-            doc = Jsoup.connect("http://weather.bigmir.net/ukraine/").timeout(timeout).get();
+            while (code!=200) {
+                try {
+                    Connection connection = Jsoup.connect("http://weather.bigmir.net/ukraine/").timeout(timeout);
+                    response = connection.execute();
+                    code = response.statusCode();
+                }catch (Exception e){
+
+                }
+            }
+            doc = response.parse();
+
+            //doc = Jsoup.connect("http://weather.bigmir.net/ukraine/").timeout(timeout).get();
             Elements newsHeadlines = doc.select("div.fl.W_col2");
 
             for (Element headline : newsHeadlines) {

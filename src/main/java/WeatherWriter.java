@@ -85,11 +85,18 @@ public class WeatherWriter extends RecursiveAction implements Runnable{
         if (element != null) {
             String title = element.select("a").attr("title");
             try {
-                Connection connection = Jsoup.connect(baseUrl + element.attr("href")).timeout(timeout);
-                 response = connection.execute();
-                 code = response.statusCode();
-                 if(code!=200) {
-                     return null;
+
+                while (code!=200) {
+                    try {
+                        Connection connection = Jsoup.connect(baseUrl + element.attr("href")).timeout(timeout);
+                        response = connection.execute();
+                        code = response.statusCode();
+                    }catch (Exception ex){
+                        //ex.printStackTrace();
+                    }
+
+//                 if(code!=200) {
+//                     return null;
                  }
                 doc = response.parse();
 

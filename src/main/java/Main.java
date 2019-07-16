@@ -13,6 +13,11 @@ public class Main {
         System.out.println("WeatherReadToFileForkJoin\n"+(end-begin)/1000000000 +"s");
         System.out.println(res);
 
+        try {
+            sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
         begin = System.nanoTime();
          res = weatherTry4.WeatherReadToFileExecutor(fileNameExe, 160,1000);
