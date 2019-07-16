@@ -30,14 +30,7 @@ public class WeatherWriter extends RecursiveAction implements Runnable{
 
     @Override
     protected void compute() {
-        String baseUrl = "http://weather.bigmir.net";
-
-        WeatherModel data = loadDocJsoup(baseUrl,0);
-        try {
-            WorkWithFileSingleton.getInstance().writeToFile(WeatherModeltoXml(data), fileName);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        this.run();
     }
 
     public  void run() {
