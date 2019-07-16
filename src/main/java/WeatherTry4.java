@@ -8,40 +8,49 @@ import org.jsoup.select.Elements;
 
 
 public class WeatherTry4 {
-    public static void main(String[] args) throws IOException {
 
-        String fileName = "D:\\test.txt";
-        ConcurrentLinkedQueue<Element> linkList = new ConcurrentLinkedQueue<Element>();
-        ScheduledExecutorService executorService = Executors.newScheduledThreadPool(320);
+    static ConcurrentLinkedQueue<Element> linkList = new ConcurrentLinkedQueue<Element>();
 
-        try {
-            Singleton.getInstance().deleteAndCreateFile(fileName);
-        } catch (IOException e) {
-            e.printStackTrace();
+    public WeatherTry4(String fileName, int countThreads, int timeIntervalMilliseconds)  {
+
+        ScheduledExecutorService executorService = Executors.newScheduledThreadPool(countThreads);
+
+        if(CreateFile(fileName)&&LoadLinkList(0)) {
+            while (linkList.size() > 0) {
+
+                executorService.scheduleAtFixedRate((new WeatherWriter(linkList, fileName)), 0, timeIntervalMilliseconds, TimeUnit.MILLISECONDS);
+            }
+
         }
+
+        executorService.shutdown();
+    }
+
+      boolean LoadLinkList(int timeout){
+        Document doc = null;
         try {
-
-
-            Document doc = Jsoup.connect("http://weather.bigmir.net/ukraine/")
-                    .timeout(0).get();
+            doc = Jsoup.connect("http://weather.bigmir.net/ukraine/")
+                    .timeout(timeout).get();
             Elements newsHeadlines = doc.select("div.fl.W_col2");
 
             for (Element headline : newsHeadlines) {
 
                 linkList.addAll(headline.select("li"));
             }
-
-        }catch (Exception ex){
-            System.out.println(ex.getMessage());
-        }finally {
-
-            while (linkList.size()>0) {
-
-                executorService.scheduleAtFixedRate((new WeatherReader(linkList, fileName )),0,1000,TimeUnit.MILLISECONDS);
-            }
-
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+        return false;
+    }
 
-        executorService.shutdown();
+      boolean CreateFile(String fileName){
+        try {
+            WorkWithFileSingleton.getInstance().deleteAndCreateFile(fileName);
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }
