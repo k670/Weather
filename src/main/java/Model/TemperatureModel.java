@@ -1,10 +1,16 @@
 package Model;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 import java.util.Date;
 
+
+@XmlRootElement
 public class TemperatureModel implements Serializable {
+    @XmlElement(name = "night")
     int night;
+    @XmlElement(name = "day")
     int day;
 
     public TemperatureModel(){

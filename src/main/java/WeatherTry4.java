@@ -6,13 +6,15 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import static java.lang.Thread.sleep;
+
 
 public class WeatherTry4 {
 
-    static ConcurrentLinkedQueue<Element> linkList = new ConcurrentLinkedQueue<Element>();
+    private static ConcurrentLinkedQueue<Element> linkList = new ConcurrentLinkedQueue<Element>();
 
-    public WeatherTry4(String fileName, int countThreads, int timeIntervalMilliseconds)  {
 
+     boolean WeatherReadToFileExecutor(String fileName, int countThreads, int timeIntervalMilliseconds){
         ScheduledExecutorService executorService = Executors.newScheduledThreadPool(countThreads);
 
         if(CreateFile(fileName)&&LoadLinkList(0)) {
@@ -24,13 +26,42 @@ public class WeatherTry4 {
         }
 
         executorService.shutdown();
+        return true;
     }
 
-      boolean LoadLinkList(int timeout){
+     boolean WeatherReadToFileForkJoin(String fileName, int countThreads, int timeIntervalMilliseconds){
+
+        ForkJoinPool pool = new ForkJoinPool(countThreads);
+        if(CreateFile(fileName)&&LoadLinkList(0)) {
+            while (linkList.size()>0){
+                for (int j = 0; j < countThreads; j++) {
+
+                    pool.execute((RecursiveAction) (new WeatherWriter(linkList,fileName)));
+                }
+
+                try {
+                    sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
+        }
+         try {
+             pool.awaitTermination(35,TimeUnit.SECONDS);
+         } catch (InterruptedException e) {
+             e.printStackTrace();
+         }
+      /*while(pool.getQueuedSubmissionCount()>0) {}
+         while(pool.getQueuedTaskCount()>0) {}*/
+     // while (!pool.isTerminated()){}
+        return pool.isTerminated();
+    }
+
+      private boolean LoadLinkList(int timeout){
         Document doc = null;
         try {
-            doc = Jsoup.connect("http://weather.bigmir.net/ukraine/")
-                    .timeout(timeout).get();
+            doc = Jsoup.connect("http://weather.bigmir.net/ukraine/").timeout(timeout).get();
             Elements newsHeadlines = doc.select("div.fl.W_col2");
 
             for (Element headline : newsHeadlines) {
@@ -44,7 +75,7 @@ public class WeatherTry4 {
         return false;
     }
 
-      boolean CreateFile(String fileName){
+    private boolean CreateFile(String fileName){
         try {
             WorkWithFileSingleton.getInstance().deleteAndCreateFile(fileName);
             return true;

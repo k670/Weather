@@ -16,17 +16,28 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.RecursiveAction;
 
 
-
-
-public class WeatherWriter implements Runnable {
+public class WeatherWriter extends RecursiveAction implements Runnable{
     ConcurrentLinkedQueue<org.jsoup.nodes.Element> list;
     String fileName;
 
     WeatherWriter(ConcurrentLinkedQueue<Element> list, String fileName) {
         this.list = list;
         this.fileName = fileName;
+    }
+
+    @Override
+    protected void compute() {
+        String baseUrl = "http://weather.bigmir.net";
+
+        WeatherModel data = loadDocJsoup(baseUrl,0);
+        try {
+            WorkWithFileSingleton.getInstance().writeToFile(WeatherModeltoXml(data), fileName);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public  void run() {
