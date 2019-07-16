@@ -22,6 +22,4 @@ public class WeatherModel implements Serializable {
         place = "Place name";
         temperature = new ConcurrentHashMap<Date,TemperatureModel>();
     }
-    /*public byte[] getBytes() {
-    }*/
 }

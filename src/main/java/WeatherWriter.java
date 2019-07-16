@@ -69,8 +69,6 @@ public class WeatherWriter extends RecursiveAction implements Runnable{
 
     private ConcurrentHashMap<Date,TemperatureModel> parsDoc(Document doc) {
         ConcurrentHashMap<Date,TemperatureModel> temperatureModel = new     ConcurrentHashMap<Date,TemperatureModel>();
-        //String data = "\n" + title;
-
         Date dt = new Date();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         Calendar c = Calendar.getInstance();
@@ -80,10 +78,8 @@ public class WeatherWriter extends RecursiveAction implements Runnable{
         for (int i = 0; i < newsHeadlines.size() - 2; i++) {
             String sEl = newsHeadlines.get(i).select("h2").toString().replace("<h2>", "").replace("</h2>", "").replace("</span>", "");
             temperatureModel.put(c.getTime(),new TemperatureModel(Integer.parseInt(sEl.substring(0, sEl.indexOf('&'))),Integer.parseInt(sEl.substring(sEl.indexOf('>') + 1))));
-            //data += "\n Data: " + sdf.format(c.getTime()) + "\tday = " + sEl.substring(0, sEl.indexOf('&')) + "\tnight = " + sEl.substring(sEl.indexOf('>') + 1) + "\t";
             c.add(Calendar.DATE, 1);
         }
-
         return temperatureModel;
     }
 
@@ -100,17 +96,15 @@ public class WeatherWriter extends RecursiveAction implements Runnable{
                  response = connection.execute();
                  code = response.statusCode();
                  if(code!=200) {
-                     //System.out.println(code);
                      return null;
                  }
-
                 doc = response.parse();
 
                 return new WeatherModel(title,parsDoc(doc));
             } catch (IOException e) {
                 System.out.println("Status Code = "+response.statusCode()+"\n"+e.getMessage());;
             }
-            return new WeatherModel(title, new ConcurrentHashMap<Date, TemperatureModel>());// "TIMEOUT "+ title;
+            return new WeatherModel(title, new ConcurrentHashMap<Date, TemperatureModel>());
         }else return null;
 
     }

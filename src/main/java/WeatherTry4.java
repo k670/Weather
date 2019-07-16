@@ -22,9 +22,7 @@ public class WeatherTry4 {
 
                 executorService.scheduleAtFixedRate((new WeatherWriter(linkList, fileName)), 0, timeIntervalMilliseconds, TimeUnit.MILLISECONDS);
             }
-
         }
-
         executorService.shutdown();
         return true;
     }
@@ -52,9 +50,6 @@ public class WeatherTry4 {
          } catch (InterruptedException e) {
              e.printStackTrace();
          }
-      /*while(pool.getQueuedSubmissionCount()>0) {}
-         while(pool.getQueuedTaskCount()>0) {}*/
-     // while (!pool.isTerminated()){}
         return pool.isTerminated();
     }
 
