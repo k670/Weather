@@ -16,14 +16,18 @@ public class WeatherTry4 {
 
 
      boolean WeatherReadToFileExecutor(String fileName, int countThreads, int timeIntervalMilliseconds){
+
         ScheduledExecutorService executorService = Executors.newScheduledThreadPool(countThreads);
+
+        int i  = 0;
 
         if(CreateFile(fileName)&&LoadLinkList(0)) {
             while (linkList.size() > 0) {
-                executorService.scheduleAtFixedRate((new WeatherWriter(linkList, fileName)), 100, timeIntervalMilliseconds, TimeUnit.MILLISECONDS);
+                i++;
+                executorService.scheduleAtFixedRate((new WeatherWriter(linkList, fileName)), (i/countThreads)*1000, timeIntervalMilliseconds, TimeUnit.MILLISECONDS);
             }
             try {
-                executorService.awaitTermination(400,TimeUnit.SECONDS);
+                executorService.awaitTermination(40,TimeUnit.SECONDS);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
